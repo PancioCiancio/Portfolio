@@ -1,5 +1,10 @@
 # Unreal Engine
-## Build
 Binaries
 Intermediate
 Saved
+DerivedDataCache
+
+# Visual Studio
+.vs
+.vsconfig
+Orda.sln

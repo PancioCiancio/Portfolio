@@ -1,11 +1,15 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 using UnrealBuildTool;
+using System.Collections.Generic;
 
 public class OrdaEditorTarget : TargetRules
 {
-    public OrdaEditorTarget(TargetInfo Target) : base(Target)
-    {
-        Type = TargetType.Editor;
-        DefaultBUildSettings = BuildSettingsVersion.V2;
-        ExtraModuleNames.AddRange( new string[] { "OrdaCore" } );
-    }
+	public OrdaEditorTarget( TargetInfo Target) : base(Target)
+	{
+		Type = TargetType.Editor;
+		DefaultBuildSettings = BuildSettingsVersion.V6;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_7;
+		ExtraModuleNames.Add("Orda");
+	}
 }

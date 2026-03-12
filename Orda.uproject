@@ -1,13 +1,13 @@
 {
-    "FileVersion": 3,
-    "EngineAssociation": "",
-    "Category": "",
-    "Description": "",
-    "Modules": [
-        {
-            "Name": "OrdaCore",
-            "Type": "Runtime",
-            "LoadingPhase": "Default"
-        }
-    ]
+	"FileVersion": 3,
+	"EngineAssociation": "{9859691E-4A1E-0B61-0D15-C2AC0077BCCE}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "Orda",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
 }

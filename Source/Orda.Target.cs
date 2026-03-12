@@ -1,11 +1,15 @@
-using UnrealBuildTool;
+// Copyright Epic Games, Inc. All Rights Reserved.
 
-public class OrdaTarget : TargetRules
+using UnrealBuildTool;
+using System.Collections.Generic;
+
+public class TestTarget : TargetRules
 {
-    public OrdaTarget(TargetInfo Target) : base(Target)
-    {
-        Type = TargetType.Game;
-        DefaultBUildSettings = BuildSettingsVersion.V2;
-        ExtraModuleNames.AddRange( new string[] { "OrdaCore" } );
-    }
+	public TestTarget(TargetInfo Target) : base(Target)
+	{
+		Type = TargetType.Game;
+		DefaultBuildSettings = BuildSettingsVersion.V6;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_7;
+		ExtraModuleNames.Add("Test");
+	}
 }

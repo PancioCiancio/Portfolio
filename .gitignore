@@ -8,3 +8,6 @@ DerivedDataCache
 .vs
 .vsconfig
 Orda.sln
+
+# Project local-only files (e.g. original textures files)
+Local

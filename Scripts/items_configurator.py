@@ -2,7 +2,7 @@
 import unreal
 
 # 1. SETUP YOUR PATHS HERE
-string_table_id = "/Game/Inventory/Items/ST_Items.ST_Items" 
+string_table_id = "/Game/Inventory/Data/ST_Items.ST_Items"
 texture_folder_path = "/Game/Inventory/Textures/Monsters" # Folder where T_AC_00 etc. live
 
 # Get currently selected assets in the Content Browser

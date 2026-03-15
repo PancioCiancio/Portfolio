@@ -21,9 +21,7 @@ void UItemGridWidget::NativeOnInitialized()
 	Descs.Reserve(64);
 
 	const TArray<FPrimaryAssetType, TInlineAllocator<8>> AssetTypes = {
-		//FPrimaryAssetType(FName(TEXT("Potion"))),
-		//FPrimaryAssetType(FName(TEXT("Armor"))),
-		//FPrimaryAssetType(FName(TEXT("Weapon"))),
+		FPrimaryAssetType(FName(TEXT("Potion"))),
 		FPrimaryAssetType(FName(TEXT("Monster")))};
 
 	for (const FPrimaryAssetType& AssetType : AssetTypes)

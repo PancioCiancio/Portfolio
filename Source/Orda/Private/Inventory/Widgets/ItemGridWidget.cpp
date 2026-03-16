@@ -15,9 +15,9 @@ void UItemGridWidget::NativeOnInitialized()
 
 	// Gather all items
 	UAssetManager& AssetManager = UAssetManager::Get();
+	TArray<FPrimaryAssetId> Ids = {};
 
 	Ids.Reserve(64);
-	Descs.Reserve(64);
 	Descs.Reserve(64);
 
 	const TArray<FPrimaryAssetType, TInlineAllocator<8>> AssetTypes = {
@@ -29,10 +29,9 @@ void UItemGridWidget::NativeOnInitialized()
 		AssetManager.GetPrimaryAssetIdList(AssetType, Ids);
 	}
 
-	AssetManager.LoadPrimaryAssets(Ids, {}, FStreamableDelegate::CreateLambda([this]()
+	// TODO: Add shared pointer to handle
+	AssetManager.LoadPrimaryAssets(Ids, {}, FStreamableDelegate::CreateLambda([=, this]()
 		{
-			// 3. Always re-fetch the Asset Manager inside async callbacks 
-			// to avoid storing references to singletons unnecessarily.
 			UAssetManager& Manager = UAssetManager::Get();
 
 			for (const FPrimaryAssetId& Id : Ids)
@@ -40,11 +39,11 @@ void UItemGridWidget::NativeOnInitialized()
 				UItemDefinition* LoadedDesc = Manager.GetPrimaryAssetObject<UItemDefinition>(Id);
 				if (LoadedDesc)
 				{
-					// 'Descs' MUST be a member variable of the class (e.g., TArray<UItemDescriptor*> Descs)
 					Descs.Add(LoadedDesc);
-					LoadedDesc->Icon.LoadSynchronous();
 				}
 			}
+
+			OnTextChanged(FText::GetEmpty());
 		}));
 
 
@@ -62,11 +61,22 @@ void UItemGridWidget::NativeConstruct()
 	Super::NativeConstruct();
 }
 
+void UItemGridWidget::SetSearchedAssetType(FPrimaryAssetType Type)
+{
+	SearchedAssetType = Type;
+
+	OnTextChanged(EditableText_SearchBar->GetText());
+}
+
 void UItemGridWidget::OnTextChanged(const FText& Text)
 {
-	DescsFiltered.Empty();
+	const TArray<UItemDefinition*> TempDescs = Descs.FilterByPredicate([this](const UItemDefinition* A){
+		return !SearchedAssetType.IsValid() || A->GetPrimaryAssetId().PrimaryAssetType == SearchedAssetType;
+	});
 
-	Searcher::Filter(SearchBarTextFilter, Text, Descs, DescsFiltered);
+	TArray<UItemDefinition*> DescsFiltered = {};
+	
+	Searcher::Filter(SearchBarTextFilter, Text, TempDescs, DescsFiltered);
 
 	TileView_Items->ClearListItems();
 
@@ -81,6 +91,8 @@ void UItemGridWidget::ItemToStringArray(UItemDefinition* Desc, TArray<FString>& 
 	if (Desc)
 	{
 		OutFilterStrings.Add(Desc->Name.ToString());
-		//OutFilterStrings.Add(Desc->Description.ToString());
+
+		// You can add more "rules" here...
+		// E.g. OutFilterStrings.Add(Desc->Description.ToString());
 	}
 }

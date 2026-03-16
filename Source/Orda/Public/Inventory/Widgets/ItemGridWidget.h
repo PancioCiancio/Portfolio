@@ -33,12 +33,14 @@ protected:
 
 private:
 
-	UPROPERTY(Transient)
-	TArray<FPrimaryAssetId> Ids;
-
 	TSharedPtr<TTextFilter<UItemDefinition*>> SearchBarTextFilter;
 
 // Runtime configuration
+public:
+
+	UFUNCTION(BlueprintCallable)
+	void SetSearchedAssetType(FPrimaryAssetType Type);
+
 private:
 
 	UFUNCTION()
@@ -51,7 +53,7 @@ private:
 	TArray<UItemDefinition*> Descs;
 
 	UPROPERTY(Transient)
-	TArray<UItemDefinition*> DescsFiltered;
+	FPrimaryAssetType SearchedAssetType;
 
 // Widget references
 protected:

@@ -2,6 +2,7 @@
 
 #include "Engine/AssetManager.h"
 #include "Components/EditableText.h"
+#include "Components/TextBlock.h"
 #include "Components/TileView.h"
 #include "Components/Image.h"
 
@@ -29,21 +30,24 @@ void UItemGridWidget::NativeOnInitialized()
 		AssetManager.GetPrimaryAssetIdList(AssetType, Ids);
 	}
 
-	// TODO: Add shared pointer to handle
-	AssetManager.LoadPrimaryAssets(Ids, {}, FStreamableDelegate::CreateLambda([=, this]()
+	StreamAssetsHandle = AssetManager.LoadPrimaryAssets(Ids, {}, FStreamableDelegate::CreateLambda([=, this]()
 		{
 			UAssetManager& Manager = UAssetManager::Get();
+			FStreamableManager& Streamable = UAssetManager::GetStreamableManager();
+			TArray<FSoftObjectPath> ItemsToStream = {};
 
 			for (const FPrimaryAssetId& Id : Ids)
 			{
 				UItemDefinition* LoadedDesc = Manager.GetPrimaryAssetObject<UItemDefinition>(Id);
-				if (LoadedDesc)
-				{
-					Descs.Add(LoadedDesc);
-				}
+				check(LoadedDesc);
+
+				Descs.Add(LoadedDesc);
+				ItemsToStream.Add(LoadedDesc->Icon.ToSoftObjectPath());
 			}
 
-			OnTextChanged(FText::GetEmpty());
+			StreamIconsHandle = Streamable.RequestAsyncLoad(ItemsToStream, FStreamableDelegate::CreateLambda([this](){
+				OnTextChanged(FText::GetEmpty());
+			}));
 		}));
 
 
@@ -59,6 +63,14 @@ void UItemGridWidget::NativeOnInitialized()
 void UItemGridWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+}
+
+void UItemGridWidget::NativeDestruct()
+{
+	StreamIconsHandle.Reset();
+	StreamAssetsHandle.Reset();
+	
+	Super::NativeDestruct();
 }
 
 void UItemGridWidget::SetSearchedAssetType(FPrimaryAssetType Type)

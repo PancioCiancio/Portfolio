@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Misc/TextFilter.h"
 #include "Templates/SharedPointer.h"
+#include "Engine/StreamableManager.h"
 
 #include "ItemGridWidget.generated.h"
 
@@ -11,6 +12,7 @@
 // Forward declarations
 class UEditableText;
 class UTileView;
+class UTextBlock;
 
 class UItemDefinition;
 class UItemEntryWidget;
@@ -24,6 +26,7 @@ public:
 
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 
 // Configuration
 protected:
@@ -55,9 +58,12 @@ private:
 	UPROPERTY(Transient)
 	FPrimaryAssetType SearchedAssetType;
 
+	TSharedPtr<FStreamableHandle> StreamAssetsHandle;
+	TSharedPtr<FStreamableHandle> StreamIconsHandle;
+
 // Widget references
 protected:
-	
+
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UEditableText> EditableText_SearchBar;
 

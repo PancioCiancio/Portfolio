@@ -34,7 +34,6 @@ void UItemGridWidget::NativeOnInitialized()
 		{
 			UAssetManager& Manager = UAssetManager::Get();
 			FStreamableManager& Streamable = UAssetManager::GetStreamableManager();
-			TArray<FSoftObjectPath> ItemsToStream = {};
 
 			for (const FPrimaryAssetId& Id : Ids)
 			{
@@ -42,12 +41,9 @@ void UItemGridWidget::NativeOnInitialized()
 				check(LoadedDesc);
 
 				Descs.Add(LoadedDesc);
-				ItemsToStream.Add(LoadedDesc->Icon.ToSoftObjectPath());
 			}
 
-			StreamIconsHandle = Streamable.RequestAsyncLoad(ItemsToStream, FStreamableDelegate::CreateLambda([this](){
-				OnTextChanged(FText::GetEmpty());
-			}));
+			OnTextChanged(FText::GetEmpty());
 		}));
 
 

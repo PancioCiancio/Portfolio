@@ -5,9 +5,7 @@
 #include "Misc/TextFilter.h"
 #include "Templates/SharedPointer.h"
 
-/**
- * 
- */
+//
 class Searcher
 {
 public:

@@ -14,8 +14,7 @@ class UEditableText;
 class UTileView;
 class UTextBlock;
 
-class UItemDefinition;
-class UItemEntryWidget;
+class UItemData;
 
 UCLASS(Blueprintable, BlueprintType)
 class UItemGridWidget : public UUserWidget
@@ -36,7 +35,7 @@ protected:
 
 private:
 
-	TSharedPtr<TTextFilter<UItemDefinition*>> SearchBarTextFilter;
+	TSharedPtr<TTextFilter<UItemData*>> SearchBarTextFilter;
 
 // Runtime configuration
 public:
@@ -50,16 +49,10 @@ private:
 	void OnTextChanged(const FText& Text);
 
 	UFUNCTION()
-	void ItemToStringArray(UItemDefinition* Desc, TArray<FString>& OutFilterStrings);
+	void ItemToStringArray(UItemData* Desc, TArray<FString>& OutFilterStrings);
 
 	UPROPERTY(Transient)
-	TArray<UItemDefinition*> Descs;
-
-	UPROPERTY(Transient)
-	FPrimaryAssetType SearchedAssetType;
-
-	TSharedPtr<FStreamableHandle> StreamAssetsHandle;
-	TSharedPtr<FStreamableHandle> StreamIconsHandle;
+	TArray<UItemData*> Descs;
 
 // Widget references
 protected:

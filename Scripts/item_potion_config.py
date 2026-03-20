@@ -36,7 +36,7 @@ with unreal.ScopedSlowTask(len(selected_assets), "Updating Data Assets") as slow
         desc_text = unreal.TextLibrary.text_from_string_table(string_table_id, desc_key)
 
         # 5. FIND TEXTURE
-        texture_path = f"{texture_folder_path}/T_AB_{index_str}.T_AB_{index_str}"
+        texture_path = f"{texture_folder_path}/T_AB_{index_int}.T_AB_{index_int}"
         texture = unreal.EditorAssetLibrary.load_asset(texture_path)
 
         # 6. SET PROPERTIES

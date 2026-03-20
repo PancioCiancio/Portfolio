@@ -7,53 +7,22 @@
 #include "Components/Image.h"
 
 #include "Common/Searcher.h"
-#include "Inventory/Data/ItemDefinition.h"
-#include "Inventory/Widgets/ItemEntryWidget.h"
+#include "Inventory/Data/ItemData.h"
+#include "Inventory/Core/InventorySubsystem.h"
 
 void UItemGridWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	// Gather all items
-	UAssetManager& AssetManager = UAssetManager::Get();
-	TArray<FPrimaryAssetId> Ids = {};
-
-	Ids.Reserve(64);
-	Descs.Reserve(64);
-
-	const TArray<FPrimaryAssetType, TInlineAllocator<8>> AssetTypes = {
-		FPrimaryAssetType(FName(TEXT("Potion"))),
-		FPrimaryAssetType(FName(TEXT("Monster")))};
-
-	for (const FPrimaryAssetType& AssetType : AssetTypes)
-	{
-		AssetManager.GetPrimaryAssetIdList(AssetType, Ids);
-	}
-
-	StreamAssetsHandle = AssetManager.LoadPrimaryAssets(Ids, {}, FStreamableDelegate::CreateLambda([=, this]()
-		{
-			UAssetManager& Manager = UAssetManager::Get();
-			FStreamableManager& Streamable = UAssetManager::GetStreamableManager();
-
-			for (const FPrimaryAssetId& Id : Ids)
-			{
-				UItemDefinition* LoadedDesc = Manager.GetPrimaryAssetObject<UItemDefinition>(Id);
-				check(LoadedDesc);
-
-				Descs.Add(LoadedDesc);
-			}
-
-			OnTextChanged(FText::GetEmpty());
-		}));
-
-
 	// Create TTextFilter
-	SearchBarTextFilter = MakeShared<TTextFilter<UItemDefinition*>>(
-		TTextFilter<UItemDefinition*>::FItemToStringArray::CreateUObject(this, &UItemGridWidget::ItemToStringArray));
-
+	SearchBarTextFilter = MakeShared<TTextFilter<UItemData*>>(
+		TTextFilter<UItemData*>::FItemToStringArray::CreateUObject(this, &UItemGridWidget::ItemToStringArray));
 
 	// Bind callback to search bar
 	EditableText_SearchBar->OnTextChanged.AddUniqueDynamic(this, &UItemGridWidget::OnTextChanged);
+
+	// Init all entries and show them all
+	OnTextChanged(FText::GetEmpty());
 }
 
 void UItemGridWidget::NativeConstruct()
@@ -63,27 +32,29 @@ void UItemGridWidget::NativeConstruct()
 
 void UItemGridWidget::NativeDestruct()
 {
-	StreamIconsHandle.Reset();
-	StreamAssetsHandle.Reset();
-	
 	Super::NativeDestruct();
 }
 
 void UItemGridWidget::SetSearchedAssetType(FPrimaryAssetType Type)
 {
-	SearchedAssetType = Type;
-
 	OnTextChanged(EditableText_SearchBar->GetText());
 }
 
 void UItemGridWidget::OnTextChanged(const FText& Text)
 {
-	const TArray<UItemDefinition*> TempDescs = Descs.FilterByPredicate([this](const UItemDefinition* A){
-		return !SearchedAssetType.IsValid() || A->GetPrimaryAssetId().PrimaryAssetType == SearchedAssetType;
+	const UGameInstance* GameInstance = GetGameInstance();
+	check(GameInstance);
+
+	const UInventorySubsystem* Subsystem = GameInstance->GetSubsystem<UInventorySubsystem>();
+	check(Subsystem);
+
+	const TArray<UItemData*> TempDescs = Subsystem->GetLoadedItems().FilterByPredicate([this](const UItemData* A) {
+		return true;
 	});
 
-	TArray<UItemDefinition*> DescsFiltered = {};
-	
+	TArray<UItemData*> DescsFiltered = {};
+	DescsFiltered.Reserve(TempDescs.Num());
+
 	Searcher::Filter(SearchBarTextFilter, Text, TempDescs, DescsFiltered);
 
 	TileView_Items->ClearListItems();
@@ -94,7 +65,7 @@ void UItemGridWidget::OnTextChanged(const FText& Text)
 	}
 }
 
-void UItemGridWidget::ItemToStringArray(UItemDefinition* Desc, TArray<FString>& OutFilterStrings)
+void UItemGridWidget::ItemToStringArray(UItemData* Desc, TArray<FString>& OutFilterStrings)
 {
 	if (Desc)
 	{
